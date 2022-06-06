@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
-build/**
+/build/*
+/build/**
+/build/**/*
+/.vscode
 components/**
 # Object files
 *.o
