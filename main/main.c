@@ -12,16 +12,17 @@
 #include "lora.h"
 #include "driver/uart.h"
 
+#define MAX_MSG_LENGTH 50
 TaskHandle_t msgTx_handle;
 const uart_port_t uart_num = UART_NUM_0;
 static const char* TAG = "uart_select_example";
 bool msgReady=false;
 
-char msg[50]={0};
+char msg[MAX_MSG_LENGTH]={0};
 
 static void uart_select_task(void *arg)
 {
-   char str[50]= {0};
+   char str[MAX_MSG_LENGTH]= {0};
    uart_config_t uart_config = {
       .baud_rate = 115200,
       .data_bits = UART_DATA_8_BITS,
@@ -43,7 +44,6 @@ static void uart_select_task(void *arg)
       // We have a driver now installed so set up the read/write functions to use driver also.
       esp_vfs_dev_uart_use_driver(0);
       ESP_LOGI(TAG,"STARTING:");
-      // printf("(empty) string is:\"%s\"\n",str);
       while (1) {
          vTaskDelay(1);
          int s;
@@ -63,14 +63,17 @@ static void uart_select_task(void *arg)
                //ESP_LOGI(TAG, "Timeout has been reached and nothing has been received");
          } else {
                if (FD_ISSET(fd, &rfds)) {
-                  char buf[2]={'a',0};
+                  char buf[2]={'a',0};//initializam un string de un caracter si string terminator
                   if (read(fd, &buf, 1) > 0) {
                      printf("%c",buf[0]);
                      fflush(stdout);
                      if(buf[0]==0x0A){
-                        strncpy(msg,str,49);
+                        //copiem pana la MAX_MSG_LENGTH-1 de caractere 
+                        //ca sa avem string terminator 
+                        //pe pozitia MAX_MSG_LENGTH in cel mai rau caz
+                        strncpy(msg,str,MAX_MSG_LENGTH-1);
                         printf("Message: %s\n",msg);
-                        str[0]=0;
+                        str[0]=0;//string terminator pe prima pozitie ,practic stergem string-ul
                         msgReady=true;
                         continue;
                      }
