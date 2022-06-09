@@ -43,7 +43,7 @@ static void uart_select_task(void *arg)
       }
       // We have a driver now installed so set up the read/write functions to use driver also.
       esp_vfs_dev_uart_use_driver(0);
-      ESP_LOGI(TAG,"STARTING:");
+      //ESP_LOGI(TAG,"STARTING:");
       while (1) {
          vTaskDelay(1);
          int s;
@@ -132,7 +132,9 @@ void app_main()
    lora_set_frequency(8683e5);
    lora_enable_crc();
    lora_set_tx_power(2);
+   
+   vTaskDelay(1);
+   xTaskCreate(&task_msgTx,"task_msgTx",2048,NULL,4,&msgTx_handle);
+   xTaskCreate(&uart_select_task,"uart_select_task",2048,NULL,5,NULL);
    //xTaskCreate(&task_contTx,"task_contTx",2048,NULL,6,NULL);
-   xTaskCreate(&task_msgTx,"task_msgTx",2048,NULL,5,&msgTx_handle);
-   xTaskCreate(&uart_select_task,"uart_select_task",2048,NULL,4,NULL);
 }
