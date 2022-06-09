@@ -115,6 +115,7 @@ void task_msgTx(void *p){
    for(;;){
       if(msgReady){
          length=strlen(msg);
+         if(length>MAX_MSG_LENGTH) length=MAX_MSG_LENGTH;
          lora_send_packet((uint8_t*) msg,length);
          printf("packet sent: %s\n",msg);
          msgReady=false;
